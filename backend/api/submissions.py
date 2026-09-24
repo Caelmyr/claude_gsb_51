@@ -39,8 +39,11 @@ def create_submission():
         contest = read_json(os.path.join(config.CONTESTS_DIR, f"{contest_id}.json"))
         if not contest:
             return err("竞赛不存在", 404)
-        if contest_status(contest) == "upcoming":
+        status = contest_status(contest)
+        if status == "upcoming":
             return err("竞赛尚未开始", 400)
+        if status == "ended":
+            return err("竞赛已结束，无法提交", 400)
         if not contest.get("visble", True) and request.user.get("role") != "admin":
             return err("竞赛不存在", 404)
         if contest.get("mode") == "acm" and request.user.get("role") != "admin":
